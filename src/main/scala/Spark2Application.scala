@@ -26,5 +26,32 @@ object Spark2Application {
     df_1.printSchema()
 
     df_1.show()
+    //Part 2
+    val schema_df_2 = StructType(
+      StructField("App", StringType, false) ::
+        StructField("Category", StringType, false) ::
+        StructField("Rating", DoubleType, false) ::
+        StructField("Reviews", IntegerType, false) ::
+        StructField("Size", StringType, false) ::
+        StructField("Installs", StringType, false) ::
+        StructField("Type", StringType, false) ::
+        StructField("Price", StringType, false) ::
+        StructField("Content Rating", StringType, false) ::
+        StructField("Genres", StringType, false) ::
+        StructField("Last Updated", StringType, false) ::
+        StructField("Current Ver", StringType, false) ::
+        StructField("Android Ver", StringType, false) :: Nil
+    )
+
+    df = spark.read.options(Map("header"->"true")).schema(schema_df_2).csv("src/main/resources/googleplaystore.csv").na.fill(0)
+
+    val df_2 = df.filter(df("Rating")>4.0).sort(col("Rating").desc)
+
+    df_2.printSchema()
+
+    df_2.show()
+
+    /*df_2.coalesce(1).write.mode("overwrite").format("com.databricks.spark.csv").option("header",
+      "true").options(Map("header"->"true", "delimiter"->"§")).csv("src/main/resoures/best_apps.csv")*/
   }
 }
