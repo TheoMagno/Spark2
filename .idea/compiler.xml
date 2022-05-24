@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Spark 2 Recruitment Challenge" />
+        <module name="Spark2" />
       </profile>
     </annotationProcessing>
   </component>
