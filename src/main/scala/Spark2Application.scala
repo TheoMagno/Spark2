@@ -53,5 +53,39 @@ object Spark2Application {
 
     /*df_2.coalesce(1).write.mode("overwrite").format("com.databricks.spark.csv").option("header",
       "true").options(Map("header"->"true", "delimiter"->"§")).csv("src/main/resoures/best_apps.csv")*/
+    //Part 3
+    val schema_df_3 = StructType(
+      StructField("App", StringType, false) ::
+        StructField("Categories", StringType, false) ::
+        StructField("Rating", DoubleType, false) ::
+        StructField("Reviews", LongType, false) ::
+        StructField("Size", StringType, false) ::
+        StructField("Installs", StringType, false) ::
+        StructField("Type", StringType, false) ::
+        StructField("Price", DoubleType, false) ::
+        StructField("Content_Rating", StringType, false) ::
+        StructField("Genres", StringType, false) ::
+        StructField("Last_Updated", StringType, false) ::
+        StructField("Current_Version", StringType, false) ::
+        StructField("Minimum_Android_Version", StringType, false) :: Nil
+    )
+
+    df = spark.read.options(Map("header"->"true")).schema(schema_df_3).csv("src/main/resources/googleplaystore.csv").na.fill(0)
+
+    val temp_1 =df.withColumn("Categories",  functions.split(col("Categories")," ").as("Categories"))
+      .groupBy(col("App"))
+      .agg(flatten(collect_list(col("Categories"))).alias("Categories"), functions.max("Rating").as("Rating"))
+
+    val temp_2 = df.withColumn("Size",regexp_extract(col("Size"), "[0-9]+", 0).cast("Double"))
+      .withColumn("Price",col("Price")*0.9)
+      .withColumn("Last_Updated", from_unixtime(unix_timestamp(col("Last_Updated"), "MMMMM dd, yyyy")).cast("Date"))
+      .withColumn("Genres", functions.split(col("Genres"),";").as("Genres"))
+      .drop("Categories", "Rating")
+
+    val df_3 = temp_1.join(temp_2, "App").dropDuplicates("App")
+
+    df_3.printSchema()
+
+    df_3.show()
   }
 }
