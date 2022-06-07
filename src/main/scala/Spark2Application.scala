@@ -104,13 +104,13 @@ object Spark2Application {
     val temp = df_3.join(df_1, "App")
 
     //Write to parquet file with gzip compression
-    temp.write.mode("overwrite").options("compression"->"gzip", "header"->"true").parquet("src/main/resources/outputs/googleplaystore_cleaned")
+    //temp.write.options("compression"->"gzip", "header"->"true").parquet("src/main/resources/outputs/googleplaystore_cleaned")
     //Part 5
     val df_4 = temp.select(col("App"),explode(col("Genres")).alias("Genre")).join(temp, "App")
       .groupBy("Genre").agg(count(lit(1)).alias("Count"), avg(col("Rating")).alias("Average_Rating"), avg(col("Average_Sentiment_Polarity")).alias("Average_Sentiment_Polarity"))
 
     df_4.show()
     //Write to parquet file with gzip compression
-    df_4.write.mode("overwrite").options("compression"->"gzip", "header"->"true").parquet("src/main/resources/outputs/googleplaystore_metrics")
+    //df_4.write.options("compression"->"gzip", "header"->"true").parquet("src/main/resources/outputs/googleplaystore_metrics")
   }
 }
